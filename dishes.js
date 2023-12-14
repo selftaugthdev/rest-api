@@ -24,3 +24,5 @@ const dishes = [
         listOfSteps: "Bake the chicken, Cook the rice and curry"
     },
 ]
+
+export default dishes;
