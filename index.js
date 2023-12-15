@@ -1,14 +1,25 @@
-import express from "express"
-import dishes from "./dishes.js"
+import express from "express";
+import dishes from "./dishes.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
+import blockUser from "./middlewares.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express()
 
 app.use(express.json())
 
 // Routes
-app.get("/", (req, res) => {
+app.get("/dishes/popular", (req, res) => {
+    const sortedDishes = [...dishes].sort((a, b) => b.clickCount - a.clickCount);
+    res.send({
+        message: "These are the most popular dishes ranked by most visited",
+        popularDishes: sortedDishes
+    });
+});
+
+app.get("/", blockUser, (req, res, next) => {
     res.send(dishes)
 })
 
@@ -26,6 +37,7 @@ app.get("/info", (req, res) => {
 app.get("/dishes/:dish", (req, res) => {
     const dish = dishes.find(d => d.name.toLowerCase() === req.params.dish.toLowerCase())
     if (dish) {
+        dish.clickCount++
         res.send(dish)
     } else {
         res.status(404).send({ message: "Dish not found" })
